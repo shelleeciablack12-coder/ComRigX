@@ -1,9 +1,22 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const PORT = process.env.PORT || 3000;
 const DIST_DIR = path.join(__dirname, 'dist');
+
+// Build React app if dist doesn't exist
+if (!fs.existsSync(DIST_DIR)) {
+  console.log('📦 Building React app...');
+  try {
+    execSync('npm run build', { stdio: 'inherit', cwd: __dirname });
+    console.log('✅ Build complete');
+  } catch (err) {
+    console.error('❌ Build failed:', err.message);
+    process.exit(1);
+  }
+}
 
 // MIME types
 const mimeTypes = {
