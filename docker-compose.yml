@@ -1,0 +1,64 @@
+# ComRigX Docker Deployment
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: comrigx-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: comrigx
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init.js:ro
+    networks:
+      - comrigx-network
+
+  # Node.js Backend Server
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: comrigx-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/comrigx?authSource=admin
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+      DEBUG: "false"
+    depends_on:
+      - mongodb
+    networks:
+      - comrigx-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: comrigx-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      VITE_BACKEND_URL: http://localhost:3001
+    depends_on:
+      - backend
+    networks:
+      - comrigx-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  comrigx-network:
+    driver: bridge
