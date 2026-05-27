@@ -81,4 +81,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`🚀 Frontend server running on port ${PORT}`);
   console.log(`📁 Serving files from ${DIST_DIR}`);
+  console.log(`✅ Ready to serve React application`);
 });
