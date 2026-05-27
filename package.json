@@ -1,0 +1,21 @@
+{
+  "name": "comrigx",
+  "version": "1.0.0",
+  "description": "Real-time messaging application",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "install": "npm install --prefix server && npm install --prefix client"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "keywords": [
+    "messaging",
+    "real-time",
+    "socket.io"
+  ],
+  "author": "",
+  "license": "MIT"
+}
